@@ -30,8 +30,8 @@ export default function ReportsCard() {
   });
 
   // 1. Category Budgets: PieChart (Sum of all selected category amounts)
-  const budgetPieData = userCategories
-    .filter(c => (c.selected === true || c.isSelected === true) && c.customAmount > 0)
+  const budgetPieData = (userCategories || [])
+    .filter(c => c && (c.selected === true || c.isSelected === true) && (c.customAmount > 0))
     .map(c => ({
       name: c.category?.name || 'Unnamed',
       value: parseFloat(c.customAmount) || 0

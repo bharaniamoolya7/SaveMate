@@ -62,7 +62,14 @@ export const userService = {
 export const transactionService = {
   getAll: async () => {
     await delay(400);
-    return { data: getStorage('transactions', []) };
+    const data = getStorage('transactions', [
+      { id: 101, amount: 1200, category: { id: 1, name: 'Food' }, categoryName: 'Food', date: '2026-04-01', description: 'Groceries', type: 'EXPENSE', isReminder: false },
+      { id: 102, amount: 15000, category: { id: 2, name: 'Rent' }, categoryName: 'Rent', date: '2026-04-01', description: 'Monthly Rent', type: 'EXPENSE', isReminder: false },
+      { id: 103, amount: 800, category: { id: 1, name: 'Food' }, categoryName: 'Food', date: '2026-04-02', description: 'Dinner', type: 'EXPENSE', isReminder: false },
+      { id: 104, amount: 2000, category: { id: 3, name: 'Transport' }, categoryName: 'Transport', date: '2026-04-03', description: 'Fuel', type: 'EXPENSE', isReminder: false },
+      { id: 105, amount: 1500, category: { id: 4, name: 'Entertainment' }, categoryName: 'Entertainment', date: '2026-04-04', description: 'Movie', type: 'EXPENSE', isReminder: false }
+    ]);
+    return { data };
   },
   add: async (data) => {
     await delay(300);
@@ -90,6 +97,15 @@ const api = {
   get: (url) => {
     if (url === '/user/details') return userService.getDetails();
     if (url === '/transactions') return transactionService.getAll();
+    if (url === '/categories/user') {
+      const cats = getStorage('userCategories', [
+        { id: 1, category: { name: 'Food' }, selected: true, customAmount: 5000 },
+        { id: 2, category: { name: 'Rent' }, selected: true, customAmount: 15000 },
+        { id: 3, category: { name: 'Transport' }, selected: true, customAmount: 2000 },
+        { id: 4, category: { name: 'Entertainment' }, selected: true, customAmount: 3000 }
+      ]);
+      return Promise.resolve({ data: cats });
+    }
     return Promise.resolve({ data: {} });
   },
   post: (url, data) => {
@@ -97,6 +113,10 @@ const api = {
     if (url === '/auth/register') return authService.register(data.username, data.password);
     if (url === '/user/details') return userService.updateDetails(data);
     if (url === '/transactions') return transactionService.add(data);
+    if (url === '/categories/user') {
+      setStorage('userCategories', data);
+      return Promise.resolve({ data: data });
+    }
     return Promise.resolve({ data: {} });
   },
   delete: (url) => {
