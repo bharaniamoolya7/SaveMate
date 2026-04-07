@@ -16,7 +16,7 @@ function App() {
   }, [theme]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.clear();
     setIsAuthenticated(false);
   };
 
