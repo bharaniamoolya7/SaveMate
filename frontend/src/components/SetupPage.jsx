@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Shield, CheckCircle2, Home, Landmark, Plus, ArrowRight, Save, TrendingDown, Wallet, Lock } from 'lucide-react';
-import { userService } from '../services/api';
+import { userService, transactionService } from '../services/api';
 
 export default function SetupPage({ setActiveTab, onUserUpdated }) {
   const [formData, setFormData] = useState({
@@ -12,12 +12,14 @@ export default function SetupPage({ setActiveTab, onUserUpdated }) {
     housingRent: '',
     otherCustom: ''
   });
+  const [totalSpent, setTotalSpent] = useState(0);
   const [showOtherDeduction, setShowOtherDeduction] = useState(false);
   const [message, setMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
+    // Fetch User Details
     userService.getDetails()
       .then(res => {
         if (res.data) {
@@ -34,6 +36,24 @@ export default function SetupPage({ setActiveTab, onUserUpdated }) {
         }
       })
       .catch(() => {});
+
+    // Fetch Transactions to calculate current month's spending
+    transactionService.getAll().then(res => {
+      if (res.data) {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        
+        const spent = res.data
+          .filter(t => {
+            const d = new Date(t.date);
+            return !t.isReminder && t.type !== 'INCOME' && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+          })
+          .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+        
+        setTotalSpent(spent);
+      }
+    }).catch(console.error);
   }, []);
 
   const handleChange = (name, value) => {
@@ -51,7 +71,7 @@ export default function SetupPage({ setActiveTab, onUserUpdated }) {
   const totalDeductions = taxAmount + loanEmi + housing + other;
   const remainingBalance = afterTax - loanEmi - housing - other;
   const targetSavings = parseFloat(formData.targetSavings) || 0;
-  const spendablePower = remainingBalance - targetSavings;
+  const spendablePower = remainingBalance - targetSavings - totalSpent;
 
   const handleSave = async () => {
     if (!formData.fullName.trim()) {
@@ -296,6 +316,10 @@ export default function SetupPage({ setActiveTab, onUserUpdated }) {
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
                 <span style={{ color: '#94A3B8' }}>Savings Target</span>
                 <span style={{ color: '#F59E0B', fontWeight: '700' }}>-₹{targetSavings.toLocaleString('en-IN')}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span style={{ color: '#94A3B8' }}>Month's Expenses</span>
+                <span style={{ color: '#EF4444', fontWeight: '700' }}>-₹{totalSpent.toLocaleString('en-IN')}</span>
               </div>
               <div style={{ height: '1px', background: 'rgba(255,255,255,0.08)', margin: '4px 0' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px' }}>
