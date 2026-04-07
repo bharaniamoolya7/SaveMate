@@ -105,7 +105,7 @@ export default function TransactionsCard() {
     return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
   });
 
-  const totalSpent = currentMonthTxs.filter(t => t.type === 'EXPENSE' && !t.isReminder).reduce((sum, t) => sum + t.amount, 0);
+  const totalSpent = currentMonthTxs.filter(t => t.type !== 'INCOME').reduce((sum, t) => sum + t.amount, 0);
   const totalIncome = currentMonthTxs.filter(t => t.type === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
   const remainingMoney = (afterTaxSalary + totalIncome) - totalSpent - userDetails.targetSavings;
 
@@ -347,7 +347,7 @@ export default function TransactionsCard() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.05)', padding: '14px', borderRadius: '12px' }}>
               {[
                 { label: 'Net Income (after tax)', val: `₹${afterTaxSalary.toLocaleString('en-IN')}`, col: 'white' },
-                { label: 'Tracked Expenses', val: `-₹${totalSpent.toLocaleString('en-IN')}`, col: '#EF4444' },
+                { label: 'Expenses & Reminders', val: `-₹${totalSpent.toLocaleString('en-IN')}`, col: '#EF4444' },
                 { label: 'Savings Target', val: `-₹${userDetails.targetSavings.toLocaleString('en-IN')}`, col: '#F59E0B' },
               ].map(r => (
                 <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#94A3B8' }}>

@@ -47,7 +47,8 @@ export default function SetupPage({ setActiveTab, onUserUpdated }) {
         const spent = res.data
           .filter(t => {
             const d = new Date(t.date);
-            return !t.isReminder && t.type !== 'INCOME' && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+            // Include both regular expenses AND upcoming reminders for this month
+            return t.type !== 'INCOME' && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
           })
           .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
         
