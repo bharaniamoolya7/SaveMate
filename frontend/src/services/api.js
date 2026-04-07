@@ -124,6 +124,23 @@ const api = {
       setStorage('transactions', transactions);
       return Promise.resolve({ data: newTx });
     }
+    if (url === '/categories/user') {
+      const CATEGORY_NAMES = {
+        1: 'Groceries', 2: 'Rent', 3: 'Dining', 4: 'Transport', 5: 'Utilities',
+        6: 'Healthcare', 7: 'Entertainment', 8: 'Shopping', 9: 'Gym', 10: 'Education',
+        11: 'Travel', 12: 'Pet Care', 13: 'Laundry', 14: 'House Help', 15: 'Grooming',
+        16: 'Gifts', 17: 'Streaming', 18: 'Water', 19: 'Taxes', 20: 'Insurance',
+        21: 'Charity', 22: 'Coffee', 23: 'Subscriptions', 24: 'Maintenance'
+      };
+      const updatedCats = data.map(uc => ({
+        id: uc.categoryId,
+        selected: uc.isSelected,
+        customAmount: uc.customAmount,
+        category: { id: uc.categoryId, name: CATEGORY_NAMES[uc.categoryId] || 'Other' }
+      }));
+      setStorage('userCategories', updatedCats);
+      return Promise.resolve({ data: updatedCats });
+    }
     return Promise.resolve({ data: {} });
   },
   delete: (url) => {
