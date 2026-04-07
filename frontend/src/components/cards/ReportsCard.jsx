@@ -36,19 +36,19 @@ export default function ReportsCard() {
       name: c.category?.name || 'Unnamed',
       value: parseFloat(c.customAmount) || 0
     }))
-    .sort((a,b) => b.value - a.value);
-  
+    .sort((a, b) => b.value - a.value);
+
   const totalBudget = budgetPieData.reduce((sum, item) => sum + item.value, 0);
   const BUDGET_COLORS = ['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981', '#EC4899'];
 
   // 2. Expense Distribution: Pie Chart (Amount spent per transaction category)
   const spendCatStats = completed.reduce((acc, t) => {
-    const cName = t.category?.name || 'Other';
+    const cName = t.category?.name || t.categoryName || 'Other';
     if (!acc[cName]) acc[cName] = { name: cName, value: 0 };
-    acc[cName].value += t.amount;
+    acc[cName].value += (parseFloat(t.amount) || 0);
     return acc;
   }, {});
-  const spendPieData = Object.values(spendCatStats).sort((a,b) => b.value - a.value);
+  const spendPieData = Object.values(spendCatStats).sort((a, b) => b.value - a.value);
   const SPEND_COLORS = ['#EF4444', '#F97316', '#F59E0B', '#84CC16', '#06B6D4', '#6366F1'];
 
   // 3. Yearly Monthly Spending: Bar Graph (Jan to Dec)
@@ -71,13 +71,13 @@ export default function ReportsCard() {
     acc[month].Expenses += t.amount;
     return acc;
   }, {});
-  const allMonthsSorted = Object.values(monthlyStats).sort((a,b) => b.timestamp - a.timestamp);
+  const allMonthsSorted = Object.values(monthlyStats).sort((a, b) => b.timestamp - a.timestamp);
 
   const remainingOverall = totalBudget - totalExpense;
 
   return (
     <div id="report-card-container" style={{ animation: 'fadeIn 0.5s ease', position: 'relative' }}>
-      
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <h1 style={{ fontSize: '32px', fontWeight: '800', color: 'var(--accent-primary)', margin: 0 }}>Expense Analytics Report</h1>
@@ -85,12 +85,12 @@ export default function ReportsCard() {
 
       {/* Top Section: Budget Distribution Pie Chart */}
       <div style={{ marginBottom: '32px' }}>
-        
+
         {/* 1. Category Budgets Pie Chart (Selected Sum) */}
         <div style={{ background: 'var(--panel-bg)', padding: '32px', borderRadius: '24px', border: '1px solid var(--border-color)', boxShadow: 'var(--glass-shadow)', display: 'flex', flexDirection: 'column', maxWidth: '600px', margin: '0 auto' }}>
           <h3 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '8px' }}>Budget Distribution</h3>
           <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '24px' }}>Total sum of all your selected category budgets.</p>
-          
+
           <div style={{ flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ width: '100%', height: '280px', position: 'relative' }}>
               <ResponsiveContainer width="100%" height="100%">
@@ -98,7 +98,7 @@ export default function ReportsCard() {
                   <Pie data={budgetPieData} cx="50%" cy="50%" innerRadius={65} outerRadius={100} paddingAngle={2} dataKey="value" stroke="none">
                     {budgetPieData.map((entry, index) => <Cell key={`cell-${index}`} fill={BUDGET_COLORS[index % BUDGET_COLORS.length]} />)}
                   </Pie>
-                  <Tooltip formatter={(value) => `₹${value}`} contentStyle={{borderRadius: '8px', border: 'none'}} />
+                  <Tooltip formatter={(value) => `₹${value}`} contentStyle={{ borderRadius: '8px', border: 'none' }} />
                 </PieChart>
               </ResponsiveContainer>
               <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', pointerEvents: 'none' }}>
@@ -114,14 +114,14 @@ export default function ReportsCard() {
       <div style={{ background: 'var(--panel-bg)', padding: '32px', borderRadius: '24px', border: '1px solid var(--border-color)', boxShadow: 'var(--glass-shadow)', marginBottom: '32px' }}>
         <h3 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '4px' }}>Spending Overview 2026</h3>
         <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '32px' }}>Tracking structural expense volume from January to December.</p>
-        
+
         <div style={{ height: '300px', width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={janToDecData}>
-              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-secondary)'}} />
-              <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: 'var(--text-secondary)'}} width={40} />
-              <Tooltip cursor={{fill: 'rgba(58, 46, 202, 0.05)'}} contentStyle={{borderRadius: '12px', border: 'none', background: 'white', color: 'black'}} />
-              <Bar dataKey="Spent" fill="var(--accent-primary)" radius={[6,6,0,0]} barSize={40} />
+              <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} width={40} />
+              <Tooltip cursor={{ fill: 'rgba(58, 46, 202, 0.05)' }} contentStyle={{ borderRadius: '12px', border: 'none', background: 'white', color: 'black' }} />
+              <Bar dataKey="Spent" fill="var(--accent-primary)" radius={[6, 6, 0, 0]} barSize={40} />
             </BarChart>
           </ResponsiveContainer>
         </div>

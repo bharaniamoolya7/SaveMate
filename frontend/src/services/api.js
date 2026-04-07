@@ -112,10 +112,17 @@ const api = {
     if (url === '/auth/login') return authService.login(data.username, data.password);
     if (url === '/auth/register') return authService.register(data.username, data.password);
     if (url === '/user/details') return userService.updateDetails(data);
-    if (url === '/transactions') return transactionService.add(data);
-    if (url === '/categories/user') {
-      setStorage('userCategories', data);
-      return Promise.resolve({ data: data });
+    if (url === '/transactions') {
+      const newTx = {
+        ...data,
+        id: Date.now(),
+        category: { name: data.categoryName || 'Other' },
+        date: data.date || new Date().toISOString()
+      };
+      const transactions = getStorage('transactions', []);
+      transactions.push(newTx);
+      setStorage('transactions', transactions);
+      return Promise.resolve({ data: newTx });
     }
     return Promise.resolve({ data: {} });
   },
