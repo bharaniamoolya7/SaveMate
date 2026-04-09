@@ -20,21 +20,38 @@ const setStorage = (key, value) => {
 export const authService = {
   login: async (username, password) => {
     await delay(500);
-    // For demo purposes, any username/password works!
-    const user = { 
-      id: 1, 
-      username: username || 'Guest', 
-      email: `${username || 'guest'}@example.com` 
-    };
+    const users = getStorage('registered_users', []);
+    const foundUser = users.find(u => u.username === username && u.password === password);
+
+    if (!foundUser) {
+      throw { response: { data: { message: "Invalid username or password" } } };
+    }
+
     const token = "mock-jwt-token-" + Date.now();
-    
     localStorage.setItem('token', token);
-    setStorage('user', user);
+    setStorage('user', { ...foundUser, password: '***' }); // Don't store plain password in session user object
     
-    return { data: { token, user } };
+    return { data: { token, user: foundUser } };
   },
   register: async (username, password) => {
     await delay(500);
+    const users = getStorage('registered_users', []);
+    
+    if (users.find(u => u.username === username)) {
+      throw { response: { data: { message: "User already exists" } } };
+    }
+
+    const newUser = { 
+      id: Date.now(), 
+      username, 
+      password, 
+      fullName: username,
+      email: `${username}@example.com` 
+    };
+    
+    users.push(newUser);
+    setStorage('registered_users', users);
+    
     return { data: { message: "User registered successfully!" } };
   },
 };

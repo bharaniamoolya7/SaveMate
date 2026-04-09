@@ -154,8 +154,9 @@ export default function Layout({ theme, toggleTheme, onLogout }) {
             </button>
             <button 
               onClick={() => {
-                if (window.confirm("ARE YOU SURE? This will logout your session and clear your local data.")) {
-                  alert("Your account is successfully deleted");
+                if (window.confirm("ARE YOU SURE? This will logout your session and PERMANENTLY delete your account and data.")) {
+                  localStorage.clear();
+                  alert("Your account and all data have been successfully deleted.");
                   onLogout();
                 }
               }} 
